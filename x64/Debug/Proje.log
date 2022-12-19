@@ -1,0 +1,4 @@
+﻿  Source.cpp
+C:\Users\kadir\source\repos\Proje\Proje\Source.cpp(57,35): warning C4554: '&': check operator precedence for possible error; use parentheses to clarify precedence
+C:\Users\kadir\source\repos\Proje\Proje\Source.cpp(95,35): warning C4554: '&': check operator precedence for possible error; use parentheses to clarify precedence
+  Proje.vcxproj -> C:\Users\kadir\source\repos\Proje\x64\Debug\Proje.exe
