@@ -9,27 +9,22 @@ public:
 	//Personel();
 	ifstream personelOku;
 	ofstream personelYaz;
-	ifstream mesaiOku;
-	ofstream mesaiYaz;
-	ofstream mesaiYaz2;
-	
-	void personelEkle(int);
+	ifstream personelOku2;
+	ofstream personelYaz2;
+
+	void personelEkle();
 	void maasOde();
 	void mesaiEkle();
-	int mesaiUcretleri[50];
-	string personelMesaiDuzenleme[50];
-	int maasGiderleri[50];
+	int mesaiUcretleri[500];
+	string personelMesaiDuzenleme[500];
+	string personelMaaslari[500];
+	string personelMaaslari2[500];
+	int maasGiderleri[500];
 
 };
 
-void Personel::personelEkle(int i) {
-	string pAd, pSoyad;
-	string pYas, pNo;
-	int pSayac = 0;
-
-	personelYaz.open("personeller.txt", ios::app);
-	personelOku.open("personeller.txt", ios::in);
-	mesaiYaz.open("personelMesai.txt", ios::app);
+void Personel::personelEkle() {
+	string pAd, pSoyad, pYas, pNo;
 
 	cout << "Eklenecek Personel Adi : ";
 	cin >> pAd;
@@ -40,46 +35,54 @@ void Personel::personelEkle(int i) {
 	cout << "Eklenecek Personel No : ";
 	cin >> pNo;
 
-	personelYaz << "[" << pNo << "] --> " << pAd << " " + pSoyad << " -- " << pYas << endl;
-	mesaiYaz << "[" << pNo << "] --> " << pAd << " " + pSoyad << " -- " << pYas << " -- 0" << endl;
+	// ------------------------------------------------------------- // Dosya Tanýmlama Ýþlemleri
 
+	personelYaz.open("personeller.txt", ios::app);
+	personelOku.open("personeller.txt", ios::in);
+
+	// ------------------------------------------------------------- // Dosyaya Yazma Ýþlemleri
+
+	personelYaz2.open(pAd + pSoyad + ".txt", ios::app);
+
+	personelYaz2 << pAd << " " + pSoyad << endl << "--------------------------" << endl << "PersonelNo:" << pNo << endl 
+		         << "PersonelYas:" << pYas << endl << "PersonelMesaiUcreti:" << "0" << endl << "--------------------------" << endl;
+	personelYaz <<  pAd << " " + pSoyad << endl;
+
+	personelYaz2.close();
 	personelYaz.close();
 	personelOku.close();
-	mesaiYaz.close();
 }
 
 
 void Personel::mesaiEkle() {
-	string pAd, pSoyad, veri;
+	string pAd, pSoyad, veri, toplamMesaiStr;
 	int sayac = 0;
-	int index, ucret, mesaiSaati, toplamMesai, mesai1, mesaiSecim, satirSayisi = 0;
-	string toplamMesaiStr;
+	int index, ucret, mesaiSaati, toplamMesai, mesaiSecim, adSoyadSecim, satirSayisi = 0;
 
-	mesaiYaz2.open("personelMesai2.txt", ios::app);
-	mesaiYaz.open("personelMesai.txt", ios::app);
-	mesaiOku.open("personelMesai.txt", ios::in);
+
 	personelYaz.open("personeller.txt", ios::app);
 	personelOku.open("personeller.txt", ios::in);
 
-	if (mesaiOku.is_open()) {
-		while (!mesaiOku.eof()) {				// Dosya sonuna ulaþýp ulaþamadýðýný gösteren
-			if (sayac % 8 == 0 && sayac != 0) {	// Okurken Alt satýra geçmesi için
-				cout << endl;
-				satirSayisi++;
-			}
-			else if ((sayac % 1 == 0 || sayac % 2 == 0 || sayac % 3 == 0 || sayac % 4 == 0 || sayac % 5 == 0 
-				|| sayac % 6 == 0 || sayac % 7 == 0) && (sayac != 0)) {									// okurken elemanlar arasýnda boþluk býrakmasý için
-				cout << "  ";
-			}
-			mesaiOku >> veri;
+
+	// ------------------------------------------------------------- // Personel Ad Soyadlarý Diziye Alýnýyor
+	if (personelOku.is_open()) {
+		while (!personelOku.eof()) {								// Dosya sonuna ulaþýp ulaþamadýðýný gösterir
+			personelOku >> veri;
 			personelMesaiDuzenleme[sayac] = veri;
-			cout << veri;
 			sayac++;
 		}
 	}
-	for (int i = 0; i < 10; i++) {
-		cout << personelMesaiDuzenleme[i] << endl; //7-15-23-31-39 mesai ücreti yani 7+8xIndis
+	sayac--;	// eleman sayýsý ve sayac ayný ama index olarak kullanmak istediðimiz için -- yaptýk
+
+	// ------------------------------------------------------------- // Personel Ad Soyadlarý Ekrana Basýlýyor
+	for (int i = 0; i < sayac; i++) {
+		if ((i % 2 == 0) && (i != 0))
+			cout << endl;
+		cout << personelMesaiDuzenleme[i] << " ";
 	}
+	cout << endl;
+
+	// ------------------------------------------------------------- // Mesai Ekleme Bilgileri
 	cout << "Mesai eklemek istedigin kisinin numarasi : ";
 	cin >> index;
 	--index;
@@ -87,51 +90,53 @@ void Personel::mesaiEkle() {
 	cin >> mesaiSaati;
 	cout << "Mesai saatlik ucreti : ";
 	cin >> ucret;
-	
+
+	// ------------------------------------------------------------- // Personel Adý Soyadý indexle diziden çekilip txt dosyasýna ad soyad olarak veriliyor.
 	if (index == 0)
-		mesaiSecim = 7;
+		adSoyadSecim = 0;
 	else
-		mesaiSecim = 7 + (index * 8);
+		adSoyadSecim = (index * 2);
 
-	string strMesai1 = personelMesaiDuzenleme[mesaiSecim];
-	mesai1 = stoi(strMesai1);								// String to int
+	personelOku2.open(personelMesaiDuzenleme[adSoyadSecim] + personelMesaiDuzenleme[adSoyadSecim+1] + ".txt", ios::in);
+	personelYaz2.open(personelMesaiDuzenleme[adSoyadSecim] + personelMesaiDuzenleme[adSoyadSecim+1] + ".txt", ios::in);
+
 	
-	toplamMesai = (mesai1 + (mesaiSaati * ucret));
-	
-	toplamMesaiStr = to_string(toplamMesai);
-	//cout << "Toplam Mesai : " << toplamMesai << endl;
-	personelMesaiDuzenleme[mesaiSecim] = toplamMesaiStr;
-
-	/*cout << "strMesai1 : " << strMesai1 << endl;
-	cout << "personelMesaiDuzenleme[mesaiSecim] : " << personelMesaiDuzenleme[mesaiSecim] << endl;
-	cout << "Mesai1 : " << mesai1 << endl;*/
-	for (int i = 0; i < 30; i++) {
-		cout << personelMesaiDuzenleme[i] << endl; //7-15-23-31-39 mesai ücreti yani 7+8xIndis
-	}
-	int satirIndis = 0;
-	while (satirIndis < satirSayisi) {
-		int diziIndis = 0;
-
-		if (satirIndis == 0)
-			diziIndis = 0;
-		else if (satirIndis == 1)
-			diziIndis = 8;
-		else 
-			diziIndis = 7 + (satirIndis * 8);
-		mesaiYaz2 << personelMesaiDuzenleme[diziIndis] << " " << personelMesaiDuzenleme[diziIndis + 1] << " " << personelMesaiDuzenleme[diziIndis + 2] << " "
-				 << personelMesaiDuzenleme[diziIndis + 3] << " " << personelMesaiDuzenleme[diziIndis + 4] << " " << personelMesaiDuzenleme[diziIndis + 5] << " "
-			     << personelMesaiDuzenleme[diziIndis + 6] << " " << personelMesaiDuzenleme[diziIndis + 7] << endl;
-		satirIndis++;
+	// ------------------------------------------------------------- // Mesai Eklenecek Kiþinin Dosyasýndaki Elemanlarý Diziye Alma Ýþlemi
+	if (personelOku2.is_open()) {
+		sayac = 0;
+		while (!personelOku2.eof()) {								// Dosya sonuna ulaþýp ulaþamadýðýný gösterir
+			personelOku2 >> veri;									// Dosyadaki elemanlarý teker teker alýp veri deðiþkenine atýyor
+			personelMesaiDuzenleme[sayac] = veri;					// Veri deðiþkenindeki dosya elemanlarýný diziye atýyor
+			sayac++;
+		}
 	}
 
+	//if (index == 0)
+	//	mesaiSecim = 5;
+	//else
+	//	mesaiSecim = 5 + (index * 7);
+
+	toplamMesai = (mesaiSaati * ucret);
 	
-	mesaiYaz2.close();
-	mesaiOku.close();
-	mesaiYaz.close();
+	toplamMesaiStr = to_string(toplamMesai);						// String dizisine atama yapacaðýmýz için mesaiÜcretini stringe çeviriyoruz
+	personelMesaiDuzenleme[5] = "PersonelMesaiUcreti:" + toplamMesaiStr;		//Mesai ücretini dosyadaki forma uygun hale getiriyoruz
+
+
+	// ------------------------------------------------------------- // Mesai Ekleyeceðimiz Kiþinin Verilerini Tekrardan Dosyaya Yazdýrýyoruz
+
+	personelYaz2 << personelMesaiDuzenleme[0] << " " + personelMesaiDuzenleme[1] 
+				 << endl << "--------------------------" << endl << personelMesaiDuzenleme[3] << endl
+				 << personelMesaiDuzenleme[4] << endl << personelMesaiDuzenleme[5] 
+				 << endl << "--------------------------" << endl;
+
+
+	personelOku2.close();
+	personelYaz2.close();
 	personelYaz.close();
 	personelOku.close();
-	remove("personelMesai.txt");
 }
+
+
 
 
 void Personel::maasOde() {
@@ -139,28 +144,74 @@ void Personel::maasOde() {
 	personelOku.open("personeller.txt", ios::in);
 	int sayac = 0;
 	string veri;
-	int pNo;
-	double odenenTutar = 0;
+	int index, adSoyadSecim;
+	bool odensinMi = true;
+
+
 	if (personelOku.is_open()) {
 		while (!personelOku.eof()) {
-			if (sayac % 6 == 0 && sayac != 0) {	// Okurken Alt satýra geçmesi için
-				cout << endl;
-			}
-			else if ((sayac % 1 == 0 || sayac % 2 == 0 || sayac % 3 == 0 || sayac % 4 == 0 || sayac % 5 == 0) && (sayac != 0)) {	// okurken elemanlar arasýnda boþluk býrakmasý için
-				cout << "  ";
-			}
+			//if (sayac % 2 == 0 && sayac != 0) {	// Okurken Alt satýra geçmesi için
+			//	cout << endl;
+			//}
+			//else if ((sayac % 1 == 0 ) && (sayac != 0)) {	// okurken elemanlar arasýnda boþluk býrakmasý için
+			//	cout << "  ";
+			//}
 			personelOku >> veri;
-			cout << veri;
+			personelMaaslari[sayac] = veri;
 			sayac++;
 		}
 	}
-	cout << "Maas Odenecek Personel No : ";
-	cin >> pNo;
-	cout << "Personelin Mesai Ucreti : "; 
-	cout << mesaiUcretleri[pNo - 1] << endl;
-	cout << "Ne Kadar Odensin ? ";
-	cin >> odenenTutar;
+	sayac--;
+	for (int i = 0; i < sayac; i++) {
+		if ((i % 2 == 0) && (i != 0))
+			cout << endl;
+		cout << personelMaaslari[i] << " ";
+	}
 
+
+	
+
+
+	cout << endl;
+	cout << "Maas Odenecek Personel No : ";
+	cin >> index;
+	index--;
+	if (index == 0)
+		adSoyadSecim = 0;
+	else
+		adSoyadSecim = (index * 2);
+
+	personelOku2.open(personelMaaslari[adSoyadSecim] + personelMaaslari[adSoyadSecim + 1] + ".txt", ios::in);
+	personelYaz2.open(personelMaaslari[adSoyadSecim] + personelMaaslari[adSoyadSecim + 1] + ".txt", ios::in);
+
+
+	// ------------------------------------------------------------- // Mesai Eklenecek Kiþinin Dosyasýndaki Elemanlarý Diziye Alma Ýþlemi
+	if (personelOku2.is_open()) {
+		sayac = 0;
+		while (!personelOku2.eof()) {								// Dosya sonuna ulaþýp ulaþamadýðýný gösterir
+			personelOku2 >> veri;									// Dosyadaki elemanlarý teker teker alýp veri deðiþkenine atýyor
+			personelMaaslari2[sayac] = veri;					// Veri deðiþkenindeki dosya elemanlarýný diziye atýyor
+			sayac++;
+		}
+	}
+
+	cout << personelMaaslari2[5] << endl;
+	cout << "Mesai Ucreti Odensin Mi ? // 1 - Evet // 0 - Hayir " << endl;
+	cin >> odensinMi;
+	if (odensinMi == true)
+		personelMaaslari2[5] = "PersonelMesaiUcreti:0";
+
+
+	// ------------------------------------------------------------- // Mesai Ekleyeceðimiz Kiþinin Verilerini Tekrardan Dosyaya Yazdýrýyoruz
+
+	personelYaz2 << personelMaaslari2[0] << " " + personelMaaslari2[1]
+		<< endl << "--------------------------" << endl << personelMaaslari2[3] << endl
+		<< personelMaaslari2[4] << endl << personelMaaslari2[5]
+		<< endl << "--------------------------" << endl;
+
+
+	personelYaz2.close();
+	personelOku2.close();
 	personelYaz.close();
 	personelOku.close();
 }
@@ -180,7 +231,6 @@ int main() {
 	Personel p;
 	bool switchDevamMi = true;
 	int secim;
-	int sayac = 0;
 
 
 	while (switchDevamMi) {
@@ -196,8 +246,7 @@ int main() {
 		switch (secim)
 		{
 		case 1:
-			p.personelEkle(sayac);
-			sayac++;
+			p.personelEkle();
 			break;
 		case 2:
 			p.mesaiEkle();
